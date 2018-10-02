@@ -33,6 +33,7 @@ public class UIManager {
         this.offlineContainer = (LinearLayout) activity.findViewById(R.id.offlineContainer);
         this.webView = (WebView) activity.findViewById(R.id.webView);
 
+
         // set click listener for offline-screen
         offlineContainer.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -69,10 +70,12 @@ public class UIManager {
     public void setLoading(boolean isLoading) {
         if (isLoading) {
             progressSpinner.setVisibility(View.VISIBLE);
-            webView.animate().translationX(Constants.SLIDE_EFFECT).alpha(0.5F).setInterpolator(new AccelerateInterpolator()).start();
+            webView.setVisibility(View.INVISIBLE);
+//            webView.animate().translationX(Constants.SLIDE_EFFECT).alpha(0.5F).setInterpolator(new AccelerateInterpolator()).start();
         } else {
-            webView.setTranslationX(Constants.SLIDE_EFFECT * -1);
-            webView.animate().translationX(0).alpha(1F).setInterpolator(new DecelerateInterpolator()).start();
+//            webView.setTranslationX(Constants.SLIDE_EFFECT * -1);
+//            webView.animate().translationX(0).alpha(1F).setInterpolator(new DecelerateInterpolator()).start();
+            webView.setVisibility(View.VISIBLE);
             progressSpinner.setVisibility(View.INVISIBLE);
         }
         pageLoaded = !isLoading;

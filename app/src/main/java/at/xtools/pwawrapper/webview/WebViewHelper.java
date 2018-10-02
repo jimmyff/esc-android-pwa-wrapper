@@ -78,8 +78,10 @@ public class WebViewHelper {
         CookieManager.getInstance().setAcceptCookie(true);
         // enable JS
         webSettings.setJavaScriptEnabled(true);
+
         // must be set for our js-popup-blocker:
         webSettings.setSupportMultipleWindows(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
 
         // PWA settings
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
@@ -116,7 +118,7 @@ public class WebViewHelper {
 
         // enable HTML5-support
         webView.setWebChromeClient(new WebChromeClient() {
-            //simple yet effective redirect/popup blocker
+//            //simple yet effective redirect/popup blocker
             @Override
             public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
                 Message href = view.getHandler().obtainMessage();
@@ -129,6 +131,7 @@ public class WebViewHelper {
                 }
                 return false;
             }
+
 
             // update ProgressBar
             @Override
@@ -203,8 +206,12 @@ public class WebViewHelper {
 
     // handle external urls
     private boolean handleUrlLoad(WebView view, String url) {
+
+
         // prevent loading content that isn't ours
-        if (!url.startsWith(Constants.WEBAPP_URL)) {
+        if (!url.startsWith(Constants.WEBAPP_URL) && !url.contains(Constants.FIREBASE_DOMAIN) &&
+            !url.contains(Constants.GOOGLE_AUTH_DOMAIN) && !url.contains(Constants.FACEBOOK_AUTH_DOMAIN)
+            && !url.contains(Constants.TWITTER_AUTH_DOMAIN)) {
             // stop loading
             view.stopLoading();
 
