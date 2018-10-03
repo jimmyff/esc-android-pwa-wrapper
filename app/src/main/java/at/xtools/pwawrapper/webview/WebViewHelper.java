@@ -20,6 +20,18 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import android.support.customtabs.CustomTabsCallback;
+import android.support.customtabs.CustomTabsClient;
+import android.support.customtabs.CustomTabsIntent;
+import android.support.customtabs.CustomTabsServiceConnection;
+import android.support.customtabs.CustomTabsSession;
+//import android.support.customtabs.browseractions.BrowserActionItem;
+//import android.support.customtabs.browseractions.BrowserActionsIntent;
+//import android.support.customtabs.browseractions.BrowserServiceFileProvider;
+//import android.support.customtabs.trusted.TrustedWebActivityService;
+
+import android.widget.Toast;
+
 import at.xtools.pwawrapper.Constants;
 import at.xtools.pwawrapper.R;
 import at.xtools.pwawrapper.ui.UIManager;
@@ -118,19 +130,83 @@ public class WebViewHelper {
 
         // enable HTML5-support
         webView.setWebChromeClient(new WebChromeClient() {
-//            //simple yet effective redirect/popup blocker
+
+
+            // Jimmys
             @Override
             public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-                Message href = view.getHandler().obtainMessage();
-                view.requestFocusNodeHref(href);
-                final String popupUrl = href.getData().getString("url");
-                if (popupUrl != null) {
-                    //it's null for most rouge browser hijack ads
-                    webView.loadUrl(popupUrl);
-                    return true;
-                }
-                return false;
+                WebView tempWebView = new WebView(activity.getApplicationContext());
+                tempWebView.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                        try {
+                            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                            builder.setToolbarColor(activity.getResources().getColor(R.color.colorPrimary));
+                            CustomTabsIntent customTabsIntent = builder.build();
+                            customTabsIntent.launchUrl(view.getContext(), Uri.parse(url));
+                            return false;
+                        } catch (Exception e) {
+                            Toast.makeText(activity.getApplicationContext(), "Custom Tab Error", Toast.LENGTH_LONG).show();
+                            Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+                            activity.startActivity(browserIntent);
+                            return true;
+                        }
+                    }
+                });
+                WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+                transport.setWebView(tempWebView);
+                resultMsg.sendToTarget();
+                return true;
             }
+//
+//            // This opens a new window
+//            @Override
+//            public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+//                WebView tempWebView = new WebView(activity.getApplicationContext());
+//                tempWebView.setWebViewClient(new WebViewClient() {
+//                    @Override
+//                    public boolean shouldOverrideUrlLoading(WebView view, String url) {
+//                        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+//                        browserIntent.addCategory(Intent.CATEGORY_BROWSABLE);
+//                        activity.startActivity(browserIntent);
+//                        return true;
+//                    }
+//                });
+//                WebView.WebViewTransport transport = (WebView.WebViewTransport) resultMsg.obj;
+//                transport.setWebView(tempWebView);
+//                resultMsg.sendToTarget();
+//                return true;
+//            }
+
+
+//            @Override
+//            public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+//                Message href = view.getHandler().obtainMessage();
+//                view.requestFocusNodeHref(href);
+//                String url = href.getData().getString("url");
+//
+//                if (url == null) {
+//                    WebView.HitTestResult result = view.getHitTestResult();
+//                    int type = result.getType();
+//                    url = result.getExtra();
+//                }
+//
+////                Toast.makeText(activity.getApplicationContext(), "OnCreateWindow", Toast.LENGTH_LONG).show();
+//
+//                if (url != null && !url.startsWith(Constants.WEBAPP_URL)) {
+//                    view.stopLoading();
+//                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+//                    CustomTabsIntent customTabsIntent = builder.build();
+//                    customTabsIntent.launchUrl(view.getContext(), Uri.parse(url));
+//                    return false;
+//                } else if (url != null) {
+//                    //it's null for most rouge browser hijack ads
+//                    webView.loadUrl(url);
+//                    return true;
+//                }
+//                return false;
+//            }
 
 
             // update ProgressBar
@@ -207,11 +283,21 @@ public class WebViewHelper {
     // handle external urls
     private boolean handleUrlLoad(WebView view, String url) {
 
+//
+//        if (!url.startsWith(Constants.WEBAPP_URL)) {
+//            view.stopLoading();
+//            CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+//            CustomTabsIntent customTabsIntent = builder.build();
+//            customTabsIntent.launchUrl(activity.getApplicationContext(), Uri.parse(url));
+//            return true;
+//        }
 
         // prevent loading content that isn't ours
-        if (!url.startsWith(Constants.WEBAPP_URL) && !url.contains(Constants.FIREBASE_DOMAIN) &&
+        if (!url.startsWith(Constants.WEBAPP_URL)
+                && !url.contains(Constants.FIREBASE_DOMAIN) &&
             !url.contains(Constants.GOOGLE_AUTH_DOMAIN) && !url.contains(Constants.FACEBOOK_AUTH_DOMAIN)
-            && !url.contains(Constants.TWITTER_AUTH_DOMAIN)) {
+            && !url.contains(Constants.TWITTER_AUTH_DOMAIN)
+                ) {
             // stop loading
             view.stopLoading();
 

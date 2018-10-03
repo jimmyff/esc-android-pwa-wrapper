@@ -15,7 +15,7 @@ public class Constants {
     // User Agent tweaks
     public static boolean POSTFIX_USER_AGENT = true; // set to true to append USER_AGENT_POSTFIX to user agent
     public static boolean OVERRIDE_USER_AGENT = false; // set to true to use USER_AGENT instead of default one
-    public static String USER_AGENT_POSTFIX = "Eurovision.app Android"; // useful for identifying traffic, e.g. in Google Analytics
+    public static String USER_AGENT_POSTFIX = "EurovisionApp Android"; // useful for identifying traffic, e.g. in Google Analytics
     public static String USER_AGENT = "WebView";
 
     // Constants

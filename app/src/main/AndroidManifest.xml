@@ -19,6 +19,7 @@
         android:supportsRtl="true">
         <activity android:name="at.xtools.pwawrapper.MainActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
+            android:launchMode="singleTask"
             android:theme="@style/AppTheme.Launch">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
